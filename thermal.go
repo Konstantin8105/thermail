@@ -1,84 +1,122 @@
 package thermal
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"math"
+	"text/tabwriter"
 )
 
-func lambda(F float64) float64 {
-	return math.Exp(-1.62 + 0.213e-2*F)
+type Layer struct {
+	Thk          float64
+	Conductivity func(F float64) float64
 }
 
-func Rep1() {
+func (l Layer) Kavg(F1, F2 float64) float64 {
+	var (
+		amount = 10
+		K      float64
+		dF     = (F2 - F1) / float64(amount-1)
+	)
+	Ki := make([]float64, amount)
+	for i := 0; i < amount; i++ {
+		Ki[i] = l.Conductivity(F1 + float64(i)*dF)
+	}
+	for i := 0; i < amount-1; i++ {
+		K += (Ki[i] + Ki[i+1]) / 2.0 * dF
+	}
+	K = K / (F2 - F1)
+	return K
+}
 
-	Tamb := 10.0 // F
-	Surf := 6.0  //1.65
+func Flat(o io.Writer, Tservice float64, layers []Layer, Tamb float64, Surf float64) (
+	Q float64, T []float64, err error) {
 
-	I := 0
-	I = I + 1
+	// nil output
+	if o == nil {
+		var buf bytes.Buffer
+		o = &buf
+	}
+	out := tabwriter.NewWriter(o, 0, 0, 1, ' ', tabwriter.AlignRight)
+	defer func() {
+		out.Flush()
+	}()
 
-	Nlayer := 1
-
-	Thk := []float64{4.0}
-
-	T := []float64{450.0, 0}
-	K := make([]float64, len(T)-1)
-
-	Thktot := 0.0
-	for I := 0; I < Nlayer; I++ {
-		Thktot += Thk[I]
+	{
+		// input data
+		fmt.Fprintf(out, "HEAT FLOW AND SURFACE TEMPERATURES OF INSULATED EQUPMENT PER ASTM C-680\n")
+		fmt.Fprintf(out, "\n")
+		fmt.Fprintf(out, "EQUPMENT SERVICE TEMPERATURE, F:\t %.1f\n", Tservice)
+		fmt.Fprintf(out, "AMBIENT TEMPERATURE, F:\t %.1f\n", Tamb)
 	}
 
-	Tdelt := T[0] - Tamb
-	for I := 0; I < Nlayer; I++ {
-		T[I+1] = T[I] - Thk[I]/Thktot*Tdelt
-	}
-
-	var iter int64
-
-T220:
-iter ++
-	//Ts := T[Nlayer+1]
-
-	var Rs float64
-	if Surf > 0 {
-		Rs = 1 / Surf
-		//Surfc = Surf
-	} else {
-		//RS = surcof(4, TS, Tamb, Emiss, Wind, Nor, 2.0)
-		//Surfc = 1 / RS
-	}
-	//Kcurve := func() float64{
-	Tmiddle := ((T[0] + T[1]) / 2.0)
-	K[0] = lambda(Tmiddle)
-	//	}()
-	Rsum := Rs
-	R := make([]float64, len(T))
-	for i := 0; i < Nlayer; i++ {
-		if K[i] > 0.01 {
-			R[i] = Thk[i] / K[i]
-			Rsum += R[i]
+	// temperature initialization
+	T = make([]float64, len(layers)+1)
+	R := make([]float64, len(layers))
+	K := make([]float64, len(layers))
+	{
+		ThkSum := 0.0
+		for _, l := range layers {
+			ThkSum += l.Thk
+		}
+		Tdelta := Tservice - Tamb
+		for i := range T {
+			if i == 0 {
+				T[0] = Tservice
+				continue
+			}
+			T[i] = T[i-1] - layers[i-1].Thk/ThkSum*Tdelta
 		}
 	}
 
-	Q := (T[0] - Tamb) / Rsum
+	var iter, iterMax int64 = 0, 2000
+	for ; iter < iterMax; iter++ {
+		// symmary
+		var Rsum float64
+		if 0 < Surf {
+			Rsum = 1.0 / Surf
+		} else {
+			// Rsum = 1.0 / surcof(4, TS, Tamb, Emiss, Wind, Nor, 2.0)
+		}
+		for i := range layers {
+			K[i] = layers[i].Kavg(T[i], T[i+1])
+			R[i] = layers[i].Thk / K[i]
+			Rsum += R[i]
+		}
 
-	Tsum := 0.0
-	Tint := T[0]
-	for i := 0; i < Nlayer; i++ {
-		Tint = T[i] - Q*R[i]
-		Tsum += math.Abs(T[i+1] - Tint)
-		T[i+1] = Tint
+		// heat flux
+		Q = (Tservice - Tamb) / Rsum
+
+		// iteration criteria
+		tol := 0.0
+		for i := range layers {
+			Ts := T[i] - Q*R[i]
+			tol += math.Abs(T[i+1] - Ts)
+			T[i+1] = Ts // store data
+		}
+		if math.Abs(tol) < 1e-5 {
+			break
+		}
+	}
+	if iterMax <= iter {
+		err = fmt.Errorf("not enougnt iterations")
+		return
 	}
 
-	if Tsum > 1e-5 {
-		goto T220
+	{
+		// output data
+		if 0 < Surf {
+			fmt.Fprintf(out, "SURFACE COEF. USED, BTU/HR.SF.F:\t %.1f\n", Surf)
+		}
+		fmt.Fprintf(out, "TOTAL HEAT FLUX, BTU/HR.SF:\t %.2f\n", Q)
+		fmt.Fprintf(out, "\n")
+		fmt.Fprintf(out, "LAYER \tINSULATION \tCONDUCTIVITY \tRESISTANCE \tTEMPERATURE,F\n")
+		fmt.Fprintf(out, "No \tTHICKNESS,in \tBTU.IN/HR.SF.F \tHR.SF.F/BTU \tINSIDE \tOUTSIDE\n")
+		for i, l := range layers {
+			fmt.Fprintf(out, "%d \t%.2f \t%.3f \t%.2f \t%.2f \t%.2f\n",
+				i, l.Thk, K[i], R[i], T[i], T[i+1])
+		}
 	}
-
-	fmt.Printf("Amount iteration:\t%d\n", iter)
-	fmt.Printf("Rs\t%.3f\n", Rs)
-	fmt.Printf("R\t%.3f\t%.3f\n", R[0], R[1])
-	fmt.Printf("Rsum\t%.3f\n", Rsum)
-	fmt.Printf("T\t%.3f\t%.3f\n", T[0], T[1])
-	fmt.Printf("Q\t%.3f\n", Q)
+	return
 }
