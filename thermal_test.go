@@ -316,3 +316,44 @@ func ExampleProblem4() {
 	//      1          2.00           0.306         9.23  297.76 107.03
 	//      2          1.50           0.176         9.36  107.03 -86.45
 }
+
+func ExampleStack() {
+	// Diameter = 2.4 meter
+	// Tinside  = 200 degree C
+	// Tair     = 40 degree C
+	// Thk      = 50 mm
+	Q, T, err := Cylinder(os.Stdout, 392.0, []Layer{
+		Layer{
+			Thk: 1.9685,
+			Mat: LHV124,
+		},
+	}, 104.0, Emiss(0.0, 0.90, PipeVertical), 78.74)
+	if err != nil {
+		fmt.Fprintf(os.Stdout, "%v", err)
+		return
+	}
+	_ = Q
+	_ = T
+	fmt.Fprintf(os.Stdout, "\n CASING TEMPERATURE : %.1fF = %.1fC",
+		T[1],
+		(T[1]-32.0)*5.0/9.0,
+	)
+
+	// Output:
+	// HEAT FLOW AND SURFACE TEMPERATURES OF INSULATED EQUPMENT PER ASTM C-680
+	//
+	//          PIPE OUSIDE INSULLATION: YES
+	//         ACTUAL PIPE DIAMETER, IN:  78.74
+	//      PIPE SERVICE TEMPERATURE, F: 392.00
+	//           AMBIENT TEMPERATURE, F: 104.00
+	//                        EMITTANCE:   0.90
+	//                  WIND SPEED, MPH:   0.00
+	//  SURFACE COEF. USED, BTU/HR.SF.F:   1.94
+	//       TOTAL HEAT FLUX, BTU/HR.SF: 3600.78
+	//
+	//  LAYER    INSULATION    CONDUCTIVITY   RESISTANCE TEMPERATURE,F
+	//     No  THICKNESS,in  BTU.IN/HR.SF.F  HR.SF.F/BTU  INSIDE OUTSIDE
+	//      0          1.97           1.661         1.21  392.00 189.95
+	//
+	//  CASING TEMPERATURE : 190.0F = 87.8C
+}
