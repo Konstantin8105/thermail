@@ -295,7 +295,7 @@ func calc(o io.Writer, Tservice float64, layers []Layer, Tamb float64, es *Exter
 			fmt.Fprintf(out, "EMITTANCE:\t %.1f\n", es.emiss)
 			fmt.Fprintf(out, "WIND SPEED, MPH:\t %.1f\n", es.wind)
 		}
-		fmt.Fprintf(out, "SURFACE COEF. USED, BTU/HR.SF.F:\t %.1f\n", es.surf)
+		fmt.Fprintf(out, "SURFACE COEF. USED, BTU/HR.SF.F:\t %.2f\n", es.surf)
 		fmt.Fprintf(out, "TOTAL HEAT FLUX, BTU/HR.SF:\t %.2f\n", Q)
 		fmt.Fprintf(out, "\n")
 		fmt.Fprintf(out, "LAYER \tINSULATION \tCONDUCTIVITY \tRESISTANCE \tTEMPERATURE,F\n")
