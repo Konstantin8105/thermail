@@ -19,23 +19,6 @@ type MaterialPolynominal struct {
 	factors []float64
 }
 
-// func (m MaterialPolynominal) Conductivity(F float64) float64 {
-// 	K := make([]float64, len(m.factors))
-// 	for i := range m.factors {
-// 		K[i] = m.factors[i]
-// 	}
-// 	for i := 1; i < len(m.factors); i++ {
-// 		for j := i; j < len(m.factors); j++ {
-// 			K[j] *= F
-// 		}
-// 	}
-// 	Ksum := 0.0
-// 	for i := range K {
-// 		Ksum += K[i]
-// 	}
-// 	return Ksum
-// }
-
 func (m MaterialPolynominal) ConductivityAvg(F2, F1 float64) float64 {
 	K := make([]float64, len(m.factors))
 	for i := range m.factors {
@@ -68,27 +51,55 @@ func NewMaterialExp(a, b float64) Material {
 	return MaterialExp{a: a, b: b}
 }
 
+type MaterialType3 struct {
+	a1, b1, TL float64
+	a2, b2, TU float64
+	a3, b3     float64
+}
+
+func (m MaterialType3) ConductivityAvg(F1, F2 float64) float64 {
+	Kf := func(F float64) float64 {
+		if F <= m.TL {
+			return m.a1 + m.b1*F
+		}
+		if F <= m.TU {
+			return m.a2 + m.b2*F
+		}
+		return m.a3 + m.b3*F
+	}
+
+	var (
+		amount = 100
+		K      float64
+		dF     = (F2 - F1) / float64(amount-1)
+	)
+	Ki := make([]float64, amount)
+	for i := 0; i < amount; i++ {
+		Ki[i] = Kf(F1 + float64(i)*dF)
+	}
+	for i := 0; i < amount-1; i++ {
+		K += (Ki[i] + Ki[i+1]) / 2.0 * dF
+	}
+	K = K / (F2 - F1)
+	return K
+}
+
+func NewMaterialType3(
+	a1, b1, TL float64,
+	a2, b2, TU float64,
+	a3, b3 float64,
+) Material {
+	return MaterialType3{
+		a1: a1, b1: b1, TL: TL,
+		a2: a2, b2: b2, TU: TU,
+		a3: a3, b3: b3,
+	}
+}
+
 type Layer struct {
 	Thk float64
 	Mat Material
 }
-
-// func integral(F1, F2 float64, c func(float64) float64) float64 {
-// 	var (
-// 		amount = 10000
-// 		K      float64
-// 		dF     = (F2 - F1) / float64(amount-1)
-// 	)
-// 	Ki := make([]float64, amount)
-// 	for i := 0; i < amount; i++ {
-// 		Ki[i] = c(F1 + float64(i)*dF)
-// 	}
-// 	for i := 0; i < amount-1; i++ {
-// 		K += (Ki[i] + Ki[i+1]) / 2.0 * dF
-// 	}
-// 	K = K / (F2 - F1)
-// 	return K
-// }
 
 type ExternalSurface struct {
 	isSurf bool
