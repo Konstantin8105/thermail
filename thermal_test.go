@@ -280,7 +280,7 @@ func ExampleProblem4() {
 		},
 		Layer{
 			Thk: 2.0,
-			Mat: NewMaterialExp(-1.620, 0.213e-2),
+			Mat: NewMaterialExp(-1.620, 0.212e-2),
 		},
 		Layer{
 			Thk: 1.5,
@@ -307,12 +307,12 @@ func ExampleProblem4() {
 	//           AMBIENT TEMPERATURE, F: -100.00
 	//                        EMITTANCE:   0.90
 	//                  WIND SPEED, MPH:   5.00
-	//  SURFACE COEF. USED, BTU/HR.SF.F:   1.53
-	//       TOTAL HEAT FLUX, BTU/HR.SF:  94.73
+	//  SURFACE COEF. USED, BTU/HR.SF.F:   1.52
+	//       TOTAL HEAT FLUX, BTU/HR.SF:  94.68
 	//
 	//  LAYER    INSULATION    CONDUCTIVITY   RESISTANCE TEMPERATURE,F
 	//     No  THICKNESS,in  BTU.IN/HR.SF.F  HR.SF.F/BTU  INSIDE OUTSIDE
-	//      0          3.00           0.507        14.63  600.00 297.59
-	//      1          2.00           0.307         9.21  297.59 107.13
-	//      2          1.50           0.176         9.36  107.13 -86.44
+	//      0          3.00           0.507        14.62  600.00 297.76
+	//      1          2.00           0.306         9.23  297.76 107.03
+	//      2          1.50           0.176         9.36  107.03 -86.45
 }
