@@ -25,13 +25,13 @@ type MaterialPolynomial struct {
 
 // NewMaterialPolynominal return material with polynomial thermal
 // conductivity property
-func NewMaterialPolynominal(c ...float64) Material {
-	return MaterialPolynominal{factors: c}
+func NewMaterialPolynomial(c ...float64) Material {
+	return MaterialPolynomial{factors: c}
 }
 
 // ConductivityAvg return thermal conductivity between 2 temperatires.
 // Temperature unit: degree F.
-func (m MaterialPolynominal) ConductivityAvg(F2, F1 float64) float64 {
+func (m MaterialPolynomial) ConductivityAvg(F2, F1 float64) float64 {
 	K := make([]float64, len(m.factors))
 	for i := range m.factors {
 		K[i] = m.factors[i]

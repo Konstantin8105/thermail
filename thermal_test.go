@@ -63,7 +63,7 @@ func ExampleProblem2() {
 	Q, T, err := Cylinder(os.Stdout, 800.0, []Layer{
 		Layer{
 			Thk: 2.0,
-			Mat: NewMaterialPolynominal(0.400, 0.105e-3, 0.286e-6),
+			Mat: NewMaterialPolynomial(0.400, 0.105e-3, 0.286e-6),
 		},
 	}, 80.0, Surf(1.76), 3.5)
 	if err != nil {
@@ -92,7 +92,7 @@ func ExampleProblem2a() {
 	Q, T, err := Cylinder(os.Stdout, 800.0, []Layer{
 		Layer{
 			Thk: 2.5,
-			Mat: NewMaterialPolynominal(0.400, 0.105e-3, 0.286e-6),
+			Mat: NewMaterialPolynomial(0.400, 0.105e-3, 0.286e-6),
 		},
 	}, 80.0, Surf(1.76), 3.5)
 	if err != nil {
@@ -121,7 +121,7 @@ func ExampleProblem3() {
 	Q, T, err := Cylinder(os.Stdout, 800.0, []Layer{
 		Layer{
 			Thk: 3.0,
-			Mat: NewMaterialPolynominal(0.400, 0.105e-3, 0.286e-6),
+			Mat: NewMaterialPolynomial(0.400, 0.105e-3, 0.286e-6),
 		},
 	}, 80.0, Emiss(0.0, 0.90, PipeHorizontal), 3.5)
 	if err != nil {
@@ -152,7 +152,7 @@ func ExampleProblem3a() {
 	Q, T, err := Cylinder(os.Stdout, 800.0, []Layer{
 		Layer{
 			Thk: 2.0,
-			Mat: NewMaterialPolynominal(0.400, 0.105e-3, 0.286e-6),
+			Mat: NewMaterialPolynomial(0.400, 0.105e-3, 0.286e-6),
 		},
 	}, 80.0, Emiss(0.0, 0.90, PipeHorizontal), 3.5)
 	if err != nil {
@@ -183,7 +183,7 @@ func ExampleProblem3b() {
 	Q, T, err := Cylinder(os.Stdout, 800.0, []Layer{
 		Layer{
 			Thk: 2.5,
-			Mat: NewMaterialPolynominal(0.400, 0.105e-3, 0.286e-6),
+			Mat: NewMaterialPolynomial(0.400, 0.105e-3, 0.286e-6),
 		},
 	}, 80.0, Emiss(0.0, 0.90, PipeHorizontal), 3.5)
 	if err != nil {
@@ -214,7 +214,7 @@ func ExampleProblem2b() {
 	Q, T, err := Cylinder(os.Stdout, 800.0, []Layer{
 		Layer{
 			Thk: 3.0,
-			Mat: NewMaterialPolynominal(0.400, 0.105e-3, 0.286e-6),
+			Mat: NewMaterialPolynomial(0.400, 0.105e-3, 0.286e-6),
 		},
 	}, 80.0, Emiss(0.0, 0.90, PipeHorizontal), 3.5)
 	if err != nil {
@@ -245,7 +245,7 @@ func ExampleProblem3c() {
 	Q, T, err := Cylinder(os.Stdout, 800.0, []Layer{
 		Layer{
 			Thk: 3.5,
-			Mat: NewMaterialPolynominal(0.400, 0.105e-3, 0.286e-6),
+			Mat: NewMaterialPolynomial(0.400, 0.105e-3, 0.286e-6),
 		},
 	}, 80.0, Emiss(0.0, 0.90, PipeHorizontal), 3.5)
 	if err != nil {
@@ -276,7 +276,7 @@ func ExampleProblem4() {
 	Q, T, err := Cylinder(os.Stdout, 600.0, []Layer{
 		Layer{
 			Thk: 3.0,
-			Mat: NewMaterialPolynominal(0.400, 0.105e-3, 0.286e-6),
+			Mat: NewMaterialPolynomial(0.400, 0.105e-3, 0.286e-6),
 		},
 		Layer{
 			Thk: 2.0,
