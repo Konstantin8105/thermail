@@ -286,7 +286,7 @@ func ExampleProblem4() {
 			Thk: 1.5,
 			Mat: NewMaterialType3(
 				0.201, 0.39e-3, -25,
-				0.182, -0.39e-3, 50,
+				0.182, -0.38e-3, 50,
 				0.141, 0.37e-3,
 			),
 		},
@@ -312,7 +312,7 @@ func ExampleProblem4() {
 	//
 	//  LAYER    INSULATION    CONDUCTIVITY   RESISTANCE TEMPERATURE,F
 	//     No  THICKNESS,in  BTU.IN/HR.SF.F  HR.SF.F/BTU  INSIDE OUTSIDE
-	//      0          3.00           0.507        14.63  600.00 297.60
-	//      1          2.00           0.307         9.21  297.60 107.17
-	//      2          1.50           0.176         9.36  107.17 -86.44
+	//      0          3.00           0.507        14.63  600.00 297.59
+	//      1          2.00           0.307         9.21  297.59 107.13
+	//      2          1.50           0.176         9.36  107.13 -86.44
 }
