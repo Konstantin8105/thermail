@@ -207,12 +207,12 @@ func calc(o io.Writer, Tservice float64, layers []Layer, Tamb float64, es *Exter
 		fmt.Fprintf(out, "\n")
 		if isCylinder {
 			fmt.Fprintf(out, "PIPE OUSIDE INSULLATION:\t YES\n")
-			fmt.Fprintf(out, "ACTUAL PIPE DIAMETER, IN:\t %.1f\n", ODpipe)
-			fmt.Fprintf(out, "PIPE SERVICE TEMPERATURE, F:\t %.1f\n", Tservice)
+			fmt.Fprintf(out, "ACTUAL PIPE DIAMETER, IN:\t %6.2f\n", ODpipe)
+			fmt.Fprintf(out, "PIPE SERVICE TEMPERATURE, F:\t %6.2f\n", Tservice)
 		} else {
-			fmt.Fprintf(out, "EQUPMENT SERVICE TEMPERATURE, F:\t %.1f\n", Tservice)
+			fmt.Fprintf(out, "EQUPMENT SERVICE TEMPERATURE, F:\t %6.2f\n", Tservice)
 		}
-		fmt.Fprintf(out, "AMBIENT TEMPERATURE, F:\t %.1f\n", Tamb)
+		fmt.Fprintf(out, "AMBIENT TEMPERATURE, F:\t %6.2f\n", Tamb)
 	}
 
 	// calculate diameters per layers
@@ -292,11 +292,11 @@ func calc(o io.Writer, Tservice float64, layers []Layer, Tamb float64, es *Exter
 	{
 		// output data
 		if !es.isSurf {
-			fmt.Fprintf(out, "EMITTANCE:\t %.1f\n", es.emiss)
-			fmt.Fprintf(out, "WIND SPEED, MPH:\t %.1f\n", es.wind)
+			fmt.Fprintf(out, "EMITTANCE:\t %6.2f\n", es.emiss)
+			fmt.Fprintf(out, "WIND SPEED, MPH:\t %6.2f\n", es.wind)
 		}
-		fmt.Fprintf(out, "SURFACE COEF. USED, BTU/HR.SF.F:\t %.2f\n", es.surf)
-		fmt.Fprintf(out, "TOTAL HEAT FLUX, BTU/HR.SF:\t %.2f\n", Q)
+		fmt.Fprintf(out, "SURFACE COEF. USED, BTU/HR.SF.F:\t %6.2f\n", es.surf)
+		fmt.Fprintf(out, "TOTAL HEAT FLUX, BTU/HR.SF:\t %6.2f\n", Q)
 		fmt.Fprintf(out, "\n")
 		fmt.Fprintf(out, "LAYER \tINSULATION \tCONDUCTIVITY \tRESISTANCE \tTEMPERATURE,F\n")
 		fmt.Fprintf(out, "No \tTHICKNESS,in \tBTU.IN/HR.SF.F \tHR.SF.F/BTU \tINSIDE \tOUTSIDE\n")
