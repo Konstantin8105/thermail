@@ -10,15 +10,27 @@ import (
 	"github.com/Konstantin8105/pow"
 )
 
+// Material is typical interface with thermal conductivity between 2 temperatires
 type Material interface {
-	// Conductivity(F float64) float64
 	ConductivityAvg(F1, F2 float64) float64
 }
 
-type MaterialPolynominal struct {
+// MaterialPolynomial is material with polynomial thermal conductivity property
+// by:
+//	f[0] + f[1]*T + f[2]*T*T + ...
+//
+type MaterialPolynomial struct {
 	factors []float64
 }
 
+// NewMaterialPolynominal return material with polynomial thermal
+// conductivity property
+func NewMaterialPolynominal(c ...float64) Material {
+	return MaterialPolynominal{factors: c}
+}
+
+// ConductivityAvg return thermal conductivity between 2 temperatires.
+// Temperature unit: degree F.
 func (m MaterialPolynominal) ConductivityAvg(F2, F1 float64) float64 {
 	K := make([]float64, len(m.factors))
 	for i := range m.factors {
@@ -35,28 +47,45 @@ func (m MaterialPolynominal) ConductivityAvg(F2, F1 float64) float64 {
 	return Ksum
 }
 
-func NewMaterialPolynominal(c ...float64) Material {
-	return MaterialPolynominal{factors: c}
-}
-
+// MaterialExp is material with exponents function thermal conductivity by:
+//	ln(k) = a + b * T
 type MaterialExp struct {
 	a, b float64
 }
 
-func (m MaterialExp) ConductivityAvg(F1, F2 float64) float64 {
-	return 1.0 / (F2 - F1) * (math.Exp(m.a+m.b*F2) - math.Exp(m.a+m.b*F1)) / m.b
-}
-
+// NewMaterialExp return material with exponents functions
 func NewMaterialExp(a, b float64) Material {
 	return MaterialExp{a: a, b: b}
 }
 
+// ConductivityAvg return thermal conductivity between 2 temperatires.
+// Temperature unit: degree F.
+func (m MaterialExp) ConductivityAvg(F1, F2 float64) float64 {
+	return 1.0 / (F2 - F1) * (math.Exp(m.a+m.b*F2) - math.Exp(m.a+m.b*F1)) / m.b
+}
+
+// MaterialType3 is material type 3
 type MaterialType3 struct {
 	a1, b1, TL float64
 	a2, b2, TU float64
 	a3, b3     float64
 }
 
+// NewMaterialType3 return material type 3
+func NewMaterialType3(
+	a1, b1, TL float64,
+	a2, b2, TU float64,
+	a3, b3 float64,
+) Material {
+	return MaterialType3{
+		a1: a1, b1: b1, TL: TL,
+		a2: a2, b2: b2, TU: TU,
+		a3: a3, b3: b3,
+	}
+}
+
+// ConductivityAvg return thermal conductivity between 2 temperatires.
+// Temperature unit: degree F.
 func (m MaterialType3) ConductivityAvg(F1, F2 float64) float64 {
 	Kf := func(F float64) float64 {
 		if F <= m.TL {
@@ -84,23 +113,13 @@ func (m MaterialType3) ConductivityAvg(F1, F2 float64) float64 {
 	return K
 }
 
-func NewMaterialType3(
-	a1, b1, TL float64,
-	a2, b2, TU float64,
-	a3, b3 float64,
-) Material {
-	return MaterialType3{
-		a1: a1, b1: b1, TL: TL,
-		a2: a2, b2: b2, TU: TU,
-		a3: a3, b3: b3,
-	}
-}
-
+// Layer of insulation
 type Layer struct {
 	Thk float64
 	Mat Material
 }
 
+// ExternalSurface is property of thermal surface
 type ExternalSurface struct {
 	isSurf bool
 	surf   float64
